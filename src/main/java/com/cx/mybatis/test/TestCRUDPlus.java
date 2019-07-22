@@ -25,7 +25,7 @@ public class TestCRUDPlus {
             for (Employee employee : employeeList){
                 System.out.println(employee);
             }
-            sqlSession.commit();
+            sqlSession.commit();//tt
         }finally {
             sqlSession.close();
 
