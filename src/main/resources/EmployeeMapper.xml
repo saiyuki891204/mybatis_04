@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cx.mybatis.dao.mapper.EmployeeMapper">
+
+    <select id="getEmployeeById" resultType="Employee" databaseId="mysql">
+        SELECT * FROM  tbl_employee WHERE  id = #{id};
+    </select>
+
+    <!--useGeneratedKeys 获取自增主键值，keyProperty指定将获取到的主键值赋值给javabean的哪个属性-->
+    <insert id="addEmp" parameterType="com.cx.mybatis.bean.Employee" useGeneratedKeys="true" keyProperty="id">
+        insert into tbl_employee (last_name,email,gender) values (#{last_name},#{email},#{gender});
+    </insert>
+
+
+    <update id="updateEmp" parameterType="com.cx.mybatis.bean.Employee">
+        update tbl_employee set last_name = #{last_name},email = #{email},gender = #{gender} where id = #{id}
+    </update>
+
+    <delete id="deleteEmpById">
+        delete from tbl_employee where id = #{id}
+    </delete>
+
+    <select id="getEmployeeByIdAndLastname"  resultType="Employee">
+        select * from tbl_employee where id = #{id} and last_name = #{last_name}
+    </select>
+
+    <select id="getEmployeeByMap" resultType="Employee">
+       select * from tbl_employee where id = #{id} and last_name = #{last_name}
+    </select>
+
+    <select id="getEmpListByLastnameLike" resultType="Employee">
+       select * from tbl_employee where last_name like #{lastName}
+    </select>
+
+
+    <select id="getEmployeeByIdReturnMap" resultType="map" databaseId="mysql">
+        SELECT * FROM  tbl_employee WHERE  id = #{id};
+    </select>
+
+    <select id="getEmpListByLastnameLikeReturnMap" resultType="Employee">
+       select * from tbl_employee where last_name like #{lastName}
+    </select>
+
+
+
+
+</mapper>

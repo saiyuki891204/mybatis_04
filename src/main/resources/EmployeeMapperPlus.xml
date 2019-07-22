@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cx.mybatis.dao.mapper.EmployeeMapperPlus">
+
+    <!--级联属性-->
+    <resultMap id="MydifEmp" type="com.cx.mybatis.bean.Employee">
+        <id column="id" property="id"/>
+        <result column="last_name" property="last_name"/>
+        <result column="gender" property="gender"/>
+        <result column="did" property="dept.id"/>
+        <result column="dept_name" property="dept.dept_name"/>
+    </resultMap>
+
+    <!--association可以用来指定联合的javabean对象-->
+    <resultMap id="MydifEmp2" type="com.cx.mybatis.bean.Employee">
+        <id column="id" property="id"/>
+        <result column="last_name" property="last_name"/>
+        <result column="gender" property="gender"/>
+        <association property="dept" javaType="com.cx.mybatis.bean.Dept">
+            <id column="did" property="id"/>
+            <result column="dept_name" property="dept_name"/>
+        </association>
+      <!--  <result column="did" property="dept.id"/>
+        <result column="dept_name" property="dept.dept_name"/>-->
+    </resultMap>
+
+    <!--查询员工的同时查询部门信息-->
+    <select id="getEmpAndDept" resultMap="MydifEmp2" >
+        SELECT e.id id,e.last_name last_name,e.gender gender, e.d_id did,
+         d.dept_name dept_name
+         FROM  tbl_employee as e ,tbl_dept as d WHERE  e.d_id = d.id and e.id = #{id};
+    </select>
+
+
+<!--分段 查询的好处之一是可以使用懒加载和按需加载-->
+    <resultMap id="MyEmpByStep" type="com.cx.mybatis.bean.Employee">
+        <id column="id" property="id"/>
+        <result column="last_name" property="last_name"/>
+        <result column="email" property="email"/>
+        <result column="gender" property="gender"/>
+        <association property="dept"
+            select="com.cx.mybatis.dao.mapper.DeptMapper.getDeptById"
+        column="d_id"></association>
+        <!--将d_id作为参数传到select语句中 select查询的是Employee的dept属性，查出来后框架会set到employee对象中-->
+    </resultMap>
+
+    <select id="getEmpByIdStep" resultMap="MyEmpByStep">
+        select * from tbl_employee where id = #{id}
+    </select>
+
+
+    <select id="getEmpsByDeptid" resultType="com.cx.mybatis.bean.Employee">
+        select * from tbl_employee where id = #{deptId}
+    </select>
+
+
+    <!--鉴别器，mybatis可以用discriminator判断某列的值，然后根据某列的值封装Employee
+           如果查出的是女生，就把部门信息查询出来，否则不查
+           如果是男生 把last_name这列的值赋给email   -->
+    <resultMap id="MyEmpByStep2" type="com.cx.mybatis.bean.Employee">
+        <id column="id" property="id"/>
+        <result column="last_name" property="last_name"/>
+        <result column="email" property="email"/>
+        <result column="gender" property="gender"/>
+        <!--使用鉴别器
+        javaType:列值对应的java类型
+        -->
+        <discriminator javaType="string" column="gender">
+            <!--女生-->
+            <case value="0" resultType="com.cx.mybatis.bean.Employee">
+                <association property="dept"
+                             select="com.cx.mybatis.dao.mapper.DeptMapper.getDeptById"
+                             column="d_id"></association>
+            </case>
+            <!--男生-->
+            <case value="1" resultType="com.cx.mybatis.bean.Employee">
+                <id column="id" property="id"/>
+                <result column="last_name" property="last_name"/>
+                <result column="last_name" property="email"/>
+                <result column="gender" property="gender"/>
+            </case>
+        </discriminator>
+
+        <!--将d_id作为参数传到select语句中 select查询的是Employee的dept属性，查出来后框架会set到employee对象中-->
+    </resultMap>
+
+    <select id="getEmpByDeptIdStep2" resultMap="MyEmpByStep2">
+        select * from tbl_employee where d_id = #{deptId}
+    </select>
+
+
+
+
+</mapper>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<!--配置mybatis运行环境 -->
+<configuration>
+    <properties resource="mysql.properties"></properties>
+
+    <!--将数据库的驼峰和javabean对应-->
+    <settings>
+       <!-- <setting name="mapUnderscoreToCamelCase" value="true"/>-->
+        <setting name="lazyLoadingEnabled" value="true"/><!--开启懒加载 默认就是开启的-->
+        <setting name="aggressiveLazyLoading" value="false"/><!-- 当开启时，任何方法的调用都会加载该对象的所有属性。否则，每个属性会按需加载,默认是false-->
+    </settings>
+
+    <!--别名处理器 type是要起别名的这个类的全类名，默认别名就是类名小写-->
+    <!--别名不区别大小写-->
+    <typeAliases>
+        <typeAlias type="com.cx.mybatis.bean.Employee" alias="employee"></typeAlias>
+
+        <!--批量起别名-->
+        <package name="com.cx.mybatis.bean"/>
+    </typeAliases>
+
+    <!--通过default指定用哪个环境的数据源-->
+    <environments default="development">
+        
+        <environment id="test">
+            <transactionManager type="JDBC"></transactionManager>
+            <dataSource type="POOLED">
+                <property name="driver" value="${jdbc.driver}" />
+                <property name="url" value="${jdbc.url}"/>
+                <property name="username" value="${jdbc.username}" />
+                <property name="password" value="${jdbc.password}" />
+            </dataSource>
+        </environment>
+
+        <environment id="development">
+            <!-- 使用jdbc管理事务，事务控制由mybatis -->
+            <transactionManager type="JDBC" />
+            <!-- 数据库连接池，由mybatis管理 -->
+            <dataSource type="POOLED">
+                <property name="driver" value="${jdbc.driver}" />
+                <property name="url" value="${jdbc.url}"/>
+                <property name="username" value="${jdbc.username}" />
+                <property name="password" value="${jdbc.password}" />
+                <!--<property name="driver" value="com.mysql.cj.jdbc.Driver" />
+                <property name="url" value="jdbc:mysql://localhost:3306/mybatis?serverTimezone=GMT%2B8" />
+                <property name="username" value="root" />
+                <property name="password" value="root" />-->
+            </dataSource>
+        </environment>
+    </environments>
+
+    <!--配置多种数据库-->
+    <databaseIdProvider type="DB_VENDOR">
+        <property name="MySQL" value="mysql"/>
+        <property name="Oracle" value="oracle"/>
+        <property name="SQL Server" value="sqlserver"/>
+    </databaseIdProvider>
+
+    <!-- 加载映射文件 -->
+    <mappers>
+        <!--class注册接口，映射文件必须 和接口同名且放在同级目录下-->
+        <mapper resource="EmployeeMapper.xml" />
+        <mapper resource="EmployeeMapperPlus.xml" />
+        <mapper resource="DeptMapper.xml" />
+
+
+        <!--没有sql映射文件  所有的sql都是利用注解写在接口上-->
+       <!-- <mapper class="com.cx.mybatis.dao.mapper.EmployeeMapperAnotation"/>-->
+
+        <!--批量注册-->
+   <!--     <package name="com.cx.mybatis.dao.mapper"/>-->
+    </mappers>
+</configuration>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cx.mybatis.dao.mapper.DeptMapper">
+
+    <select id="getDeptById" resultType="com.cx.mybatis.bean.Dept">
+        SELECT * FROM  tbl_dept WHERE  id = #{id};
+    </select>
+
+
+    <resultMap id="MyDept" type="com.cx.mybatis.bean.Dept">
+        <id column="id" property="id"/>
+        <result column="dept_name" property="dept_name"/>
+        <collection property="emps" ofType="com.cx.mybatis.bean.Employee">
+            <id column="eid" property="id"/>
+            <result column="last_name" property="last_name"/>
+            <result column="gender" property="gender"/>
+            <result column="email" property="email"/>
+        </collection>
+    </resultMap>
+        <!--查询部门时将对应的所有员工信息也查出来-->
+    <select id="getDeptByIdPlus" resultMap="MyDept">
+        SELECT
+            d.id id,
+            d.dept_name dept_name,
+            e.last_name last_name,
+            e.gender gender,
+            e.email email,
+            e.id eid
+        FROM
+            tbl_dept d
+        LEFT JOIN tbl_employee e ON d.id = e.d_id
+        WHERE
+            d.id = #{id};
+    </select>
+
+    <resultMap id="MyDeptStep" type="com.cx.mybatis.bean.Dept">
+        <id column="id" property="id"/>
+        <result column="dept_name" property="dept_name"/>
+        <collection property="emps"
+            select="com.cx.mybatis.dao.mapper.EmployeeMapperPlus.getEmpsByDeptid"
+            column="{deptId=id}" fetchType="eager"/>
+    </resultMap>
+    <!--多列值的传递
+column="{key1=colum1,key1=colum1}"
+fetchType lazy：延迟加载
+        eager:立即加载
+    -->
+    <select id="getDeptByIdStep" resultMap="MyDeptStep">
+        select id,dept_name from tbl_dept where id = #{id}
+    </select>
+
+
+</mapper>

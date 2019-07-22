@@ -1,0 +1,12 @@
+public Emploee getEmp(@Param("id")Integer id,String lastName)
+    取值：id==>#{id/param1}  lastName==>#{param2}
+
+public Emploee getEmp(Integer id,@Param("e")Employee emp);
+    取值：id==>#{param1}  lastName==>#{param2.lastName/e.lastName}
+
+ ###特别注意，如果是Collection（List Set）类型或数组，也会特殊处理。
+ 也是把传入的list或数组封装在map中
+ key：Collection（collection） 如果是List还可以用这个key（list） 数组用（array）
+
+ public Emploee getEmpByIds(List<Integer> ids);
+    取出第一个id的值：#{list[0]}
