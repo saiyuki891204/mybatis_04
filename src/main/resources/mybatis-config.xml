@@ -65,6 +65,7 @@
         <mapper resource="EmployeeMapper.xml" />
         <mapper resource="EmployeeMapperPlus.xml" />
         <mapper resource="DeptMapper.xml" />
+        <mapper resource="EmployeeMapperDynamicSQL.xml" />
 
 
         <!--没有sql映射文件  所有的sql都是利用注解写在接口上-->

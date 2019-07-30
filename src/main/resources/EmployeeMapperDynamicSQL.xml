@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cx.mybatis.dao.mapper.EmployeeMapperDynamicSQL">
+    <!--查员工，带了哪个字段的查询条件就带上这个字段的值-->
+    <!--where标签会去掉第一个多余的and-->
+    <select id="getEmpsByConditionIf" resultType="Employee" parameterType="com.cx.mybatis.bean.Employee">
+        SELECT * FROM  tbl_employee
+        <where>
+            <if test="id != null">
+                id = #{id}
+            </if>
+            <if test="last_name != null and last_name != ''">
+                and last_name like #{last_name}
+            </if>
+            /*OGNL会自动完成字符串和数字之间的转换*/
+            <if test="gender == 0 or gender == 1 ">
+                and  gender = #{gender}
+            </if>
+            <if test="email != null and email.trim() != ''">
+                and email = #{email};
+            </if>
+        </where>
+    </select>
+
+
+    <!--trim中的prefix，trim标签体中是整个字符串拼串后的结果 prefix是在这个串前面加上一段
+    prefixOverrides：前缀覆盖，去掉整个字符串前面多余的字符
+    -->
+    <select id="getEmpsByConditionTrim" resultType="Employee" parameterType="com.cx.mybatis.bean.Employee">
+        SELECT * FROM  tbl_employee
+        <trim prefix="where" suffixOverrides="and">
+            <if test="id != null">
+                id = #{id} and
+            </if>
+            <if test="last_name != null and last_name != ''">
+                last_name like #{last_name} and
+            </if>
+            /*OGNL会自动完成字符串和数字之间的转换*/
+            <if test="gender == 0 or gender == 1 ">
+                gender = #{gender} and
+            </if>
+            <if test="email != null and email.trim() != ''">
+                email = #{email} and
+            </if>
+        </trim>
+    </select>
+
+    <!--choose中的条件 满足哪一个就优先用哪个，下面的分支就不再走了，类似于switch case-->
+    <select id="getEmpsByConditionChoose" resultType="Employee" parameterType="com.cx.mybatis.bean.Employee">
+        SELECT * FROM  tbl_employee
+        <where>
+            <choose>
+                <when test="id != null"> id = #{id} </when>
+                <when test="last_name != null and last_name != ''">  last_name like #{last_name} </when>
+                <when test="email != null and email.trim() != ''"> email = #{email} </when>
+                <otherwise>gender = 0</otherwise>
+            </choose>
+        </where>
+    </select>
+
+
+    <!--更新员工  带了哪个字段就更新哪个，set标签是做更新用的-->
+    <update id="updateEmp" parameterType="com.cx.mybatis.bean.Employee">
+        update tbl_employee
+        <set>
+            <if test="last_name != null and last_name != ''">
+                last_name = #{last_name},
+            </if>
+            <if test="email != null and email.trim() != ''">
+                email = #{email},
+            </if>
+            <if test="gender == 0 or gender == 1 ">
+                gender = #{gender}
+            </if>
+        </set>
+        where id = #{id}
+/*更新可以用上面的写法 还可以用下面trim的写法  前面拼上set，并去掉最后一个逗号*/
+       <!-- update tbl_employee
+        <trim prefix="set" suffixOverrides=",">
+            <if test="last_name != null and last_name != ''">
+                last_name = #{last_name},
+            </if>
+            <if test="email != null and email.trim() != ''">
+                email = #{email},
+            </if>
+            <if test="gender == 0 or gender == 1 ">
+                gender = #{gender}
+            </if>
+        </trim>
+        where id = #{id}-->
+    </update>
+
+</mapper>
